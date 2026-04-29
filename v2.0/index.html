@@ -1,1 +1,61 @@
 
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Home Assistant</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <div class="frame">
+    <div class="card">
+      <div class="grid">
+        <section class="left">
+          <div class="tempRow">
+            <div class="temp" id="tempValue">--°C</div>
+            <div class="wxIcon" aria-label="Capteur">
+              <svg viewBox="0 0 64 64" width="72" height="72">
+                <circle cx="22" cy="24" r="10"></circle>
+                <path d="M20 44h26a10 10 0 0 0 0-20 14 14 0 0 0-27-3A9 9 0 0 0 20 44Z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="btnCol">
+            <button class="pill" id="btnHumidity">Humidité</button>
+            <button class="pill" id="btnPressure">Pression</button>
+            <button class="pill" id="btnWind">Vent</button>
+          </div>
+
+          <div class="miniStats">
+            <div class="stat"><span>Humidité</span><b id="humValue">N/A</b></div>
+            <div class="stat"><span>Pression</span><b id="presValue">N/A</b></div>
+            <div class="stat"><span>Vent</span><b id="windValue">N/A</b></div>
+          </div>
+        </section>
+
+        <section class="center">
+          <div class="clock" id="clock">--:--</div>
+        </section>
+
+        <section class="right">
+          <div class="boxTitle">Localisation / carte</div>
+          <div class="map" id="map"></div>
+        </section>
+
+        <section class="bottom">
+          <div class="boxTitle">Variation des différents capteurs (jour)</div>
+          <canvas id="chart" height="120"></canvas>
+          <div class="hint" id="hint">Chargement…</div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
