@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard Home Assistant</title>
+<link rel="stylesheet" href="./style.css" />
+<!-- Leaflet (carte) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+<div class="frame">
+<div class="card">
+<div class="grid">
+<!-- Colonne gauche (temp + icône + boutons) -->
+<section class="left">
+<div class="tempRow">
+<div class="temp" id="tempValue">--°C</div>
+<div class="wxIcon" id="wxIcon" aria-label="Météo">
+<!-- icône simple en SVG (remplacée selon la météo) -->
+<svg viewBox="0 0 64 64" width="72" height="72">
+<circle cx="22" cy="24" r="10" />
+<path d="M20 44h26a10 10 0 0 0 0-20 14 14 0 0 0-27-3A9 9 0 0 0 20 44Z" />
+</svg>
+</div>
+</div>
+<div class="btnCol">
+<button class="pill" id="btnHumidity">Humidité</button>
+<button class="pill" id="btnPressure">Pression</button>
+<button class="pill" id="btnWind">Vent</button>
+</div>
+<div class="miniStats">
+<div class="stat"><span>Humidité</span><b id="humValue">--</b></div>
+<div class="stat"><span>Pression</span><b id="presValue">--</b></div>
+<div class="stat"><span>Vent</span><b id="windValue">--</b></div>
+</div>
+</section>
+<!-- Horloge au centre -->
+<section class="center">
+<div class="clock" id="clock">--:--</div>
+</section>
+<!-- Carte à droite --> <section class="right">
+<div class="boxTitle">Localisation / carte</div>
+<div class="map" id="map"></div>
+</section>
+<!-- Graphe en bas -->
+<section class="bottom">
+<div class="boxTitle">Variation des différents capteurs (jour)</div>
+<canvas id="chart" height="120"></canvas>
+<div class="hint" id="hint">Choisis un capteur (Humidité / Pression / Vent).</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
