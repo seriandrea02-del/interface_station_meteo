@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Dashboard Météo Home Assistant</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <div class="appShell">
+    <div class="topBar">
+      <div>
+        <h1>Dashboard météo</h1>
+        <p class="subtitle">Capteurs ESP32 + météo externe</p>
+      </div>
+
+      <div class="clockBox">
+        <div class="clockLabel">Heure</div>
+        <div class="clock" id="clock">--:--</div>
+      </div>
+    </div>
+
+    <div class="dashboardGrid">
+      <!-- Bandeau du haut -->
+      <section class="panel heroPanel">
+        <div class="heroLeft">
+          <div class="smallTitle">Température capteur</div>
+
+          <div class="tempRow">
+            <div class="tempBlock">
+              <div class="temp" id="tempValue">--°C</div>
+              <div class="tempLabel">Température actuelle</div>
+            </div>
+
+            <div id="emoji" class="emoji">🙂</div>
+          </div>
+        </div>
+
+        <div class="heroRight">
+          <div class="statusBadge" id="hint">Chargement…</div>
+        </div>
+      </section>
+
+      <!-- Capteurs locaux -->
+      <section class="panel leftPanel">
+        <div class="boxTitle">Capteurs locaux Home Assistant</div>
+
+        <div class="btnCol">
+          <button class="pill active" id="btnTemperature">Température</button>
+          <button class="pill" id="btnHumidity">Humidité</button>
+          <button class="pill" id="btnPressure">Pression</button>
+          <button class="pill" id="btnWind">Vent</button>
+        </div>
+
+        <div class="statsGrid">
+          <div class="statCard">
+            <span>Humidité</span>
+            <b id="humValue">N/A</b>
+          </div>
+
+          <div class="statCard">
+            <span>Pression</span>
+            <b id="presValue">N/A</b>
+          </div>
+
+          <div class="statCard">
+            <span>Vent</span>
+            <b id="windValue">N/A</b>
+          </div>
+
+          <div class="statCard">
+            <span>Luminosité</span>
+            <b id="lightValue">N/A</b>
+          </div>
+
+          <div class="statCard">
+            <span>Pluie</span>
+            <b id="rainValue">N/A</b>
+          </div>
+        </div>
+      </section>
+
+      <!-- Météo externe -->
+     <section class="panel rightPanel">
+  <div class="boxTitle">Météo externe</div>
+
+  <div class="weatherConfig">
+    <input
+      type="text"
+      id="cityInput"
+      placeholder="Entrer une ville (ex: Metz, Paris, Lyon)"
+    />
+    <button class="pill" id="btnSearchCity">Changer de ville</button>
+    <button class="pill" id="btnUseHomeLocation">Utiliser ma localisation</button>
+  </div>
+
+  <div class="weatherStatus" id="weatherStatus">
+    La météo se charge depuis la localisation Home Assistant.
+  </div>
+
+  <div class="panelScroll weatherContent">
+    <div class="weatherHeader">
+      <div>
+        <div class="weatherCity" id="extCity">--</div>
+        <div class="weatherDesc" id="extDesc">--</div>
+      </div>
+
+      <div id="extIcon" class="weatherIconEmoji">☁️</div>
+    </div>
+
+    <div class="statsGrid weatherStatsGrid">
+      <div class="statCard">
+        <span>Température</span>
+        <b id="extTemp">N/A</b>
+      </div>
+
+      <div class="statCard">
+        <span>Ressentie</span>
+        <b id="extFeels">N/A</b>
+      </div>
+
+      <div class="statCard">
+        <span>Humidité</span>
+        <b id="extHum">N/A</b>
+      </div>
+
+      <div class="statCard">
+        <span>Pression</span>
+        <b id="extPres">N/A</b>
+      </div>
+
+      <div class="statCard">
+        <span>Vent</span>
+        <b id="extWind">N/A</b>
+      </div>
+
+      <div class="statCard">
+        <span>Pluie</span>
+        <b id="extRain">N/A</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+      <!-- Carte -->
+      <section class="panel mapPanel">
+        <div class="boxTitle">Localisation / carte</div>
+        <div class="map" id="map"></div>
+      </section>
+
+      <!-- Graphique -->
+      <section class="panel chartPanel">
+        <div class="boxTitle" id="chartTitle">Variation température capteur</div>
+        <div class="chartWrap">
+          <canvas id="chart"></canvas>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
