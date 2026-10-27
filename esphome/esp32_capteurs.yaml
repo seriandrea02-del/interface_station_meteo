@@ -1,1 +1,45 @@
-
+esphome:
+name: espbonbon
+friendly_name: espbonbon # Nom affiché dans Home Assistant
+esp32:
+board: esp32dev
+framework:
+type: arduino # Framework utilisé
+logger: # Permet d’afficher les logs (debug)
+api: # Communication avec Home Assistant
+ota: # Mise à jour du code à distance
+wifi:
+ssid: "S23"
+password: "12345678"
+ap:
+ssid: "ESP32 Fallback" # Point d’accès si Wi-Fi indisponible
+password: "12345678"
+captive_portal: # Portail de configuration Wi-Fi
+i2c:
+sda: 21
+scl: 22
+scan: true # Scan automatique des périphériques I2C
+sensor:
+- platform: bme280_i2c
+temperature:
+name: "Temperature" # Mesure en °C
+pressure:
+name: "Pression" # Mesure en hPa
+humidity:
+name: "Humidite" # Mesure en %
+address: 0x76 # Adresse I2C du BME280
+update_interval: 10s # Rafraîchissement toutes les 10s
+- platform: bh1750
+name: "Luminosite" # Mesure en lux
+address: 0x23 # Adresse I2C du capteur
+update_interval: 10s
+- platform: pulse_counter
+pin:
+number: GPIO27
+mode: INPUT_PULLUP # Résistance interne pull-up activée
+name: "Pluviometrie"
+unit_of_measurement: "mm" # Résultat en millimètres de pluie
+accuracy_decimals: 2
+update_interval: 60s # Calcul toutes les 60 secondes
+filters:
+- multiply: 0.2794 # Conversion impulsions → mm (calibration du pluviomètre)
