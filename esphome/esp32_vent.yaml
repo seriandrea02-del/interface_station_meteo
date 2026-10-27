@@ -1,1 +1,56 @@
-
+esphome:
+name: station_vent
+friendly_name: station_vent # Nom affiché dans Home Assistant
+esp32:
+board: esp32dev
+framework:
+type: arduino # Framework utilisé
+logger: # Logs pour debug
+api: # Communication avec Home Assistant
+ota: # Mise à jour à distance
+wifi:
+ssid: "S23"
+password: "12345678"
+ap:
+ssid: "fallback" # Point d’accès si Wi-Fi indisponible
+password: "12345678"
+captive_portal: # Portail de configuration
+sensor:
+# VITESSE DU VENT (ANÉMOMÈTRE)
+- platform: pulse_counter
+pin:
+  number: GPIO27
+  mode: INPUT_PULLUP # Pull-up interne (signal impulsionnel)
+name: "Vitesse vent"
+unit_of_measurement: "km/h"
+accuracy_decimals: 1
+update_interval: 5s # Mise à jour rapide
+filters:
+  - multiply: 0.04 # Conversion impulsions → km/h (calibration)
+# DIRECTION BRUTE (GIROUETTE)
+- platform: adc
+  pin: GPIO34 # Entrée analogique
+  id: direction_brute # Identifiant utilisé plus bas
+  name: "Direction brute"
+  attenuation: 11db # Permet de lire jusqu’à ~3.3V
+  update_interval: 2s
+  filters:
+    - sliding_window_moving_average:
+        window_size: 10 # Moyenne sur 10 mesures
+        send_every: 5 # Envoi toutes les 5 valeurs (lissage)
+text_sensor:
+# CONVERSION EN TEXTE (POINT CARDINAL)
+- platform: template
+  name: "Direction vent"
+  update_interval: 2s
+lambda: |-
+  float v = id(direction_brute).state; // Récupération tension
+  // Association tension → direction
+  if (v > 3.0) return {"Nord"};
+  else if (v > 2.8) return {"Nord-Est"};
+  else if (v > 2.4) return {"Est"};
+  else if (v > 1.5) return {"Sud-Est"};
+  else if (v > 0.9) return {"Nord-Ouest"};
+  else if (v > 0.7) return {"Ouest"};
+  else if (v > 0.5) return {"Sud-Ouest"};
+  else return {"Sud"};
