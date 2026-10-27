@@ -1,207 +1,176 @@
 
-# 🌦️ Station météo connectée — ESP32, Raspberry Pi et Home Assistant
+
+# 🌦️ Station météo connectée — Raspberry Pi, Home Assistant et API REST
 
 ## 1. Présentation du projet
 
-Dans le cadre de l’Unité d’Enseignement 852.2 « Architectures Embarquées », dispensée à l’Université de Lorraine et encadrée par le Professeur Camille Diou, notre groupe a réalisé un système embarqué dédié à l’acquisition, à la centralisation et à la visualisation de données météorologiques.
+Dans le cadre de l’UE 852.2 « Architectures Embarquées » à l’Université de Lorraine, sous l’encadrement du Professeur Camille Diou, notre groupe a développé un système embarqué permettant d’acquérir, de centraliser et de visualiser des données météorologiques.
 
-Le système repose sur un **ESP32**, chargé de collecter les mesures issues de capteurs physiques, et une **Raspberry Pi exécutant Home Assistant OS (HAOS)**, utilisée comme plateforme centrale de supervision.
+Le système repose sur une **Raspberry Pi exécutant Home Assistant OS (HAOS)**. Il centralise les mesures issues de capteurs physiques et les données météorologiques provenant de l’intégration Météo-France. Une interface Web développée en HTML, CSS et JavaScript permet de consulter ces informations depuis un navigateur.
 
-Les mesures locales sont transmises par Wi-Fi vers Home Assistant. Le système intègre également des données météorologiques externes provenant de l’API Météo-France afin de permettre leur comparaison avec les mesures relevées localement.
+L’objectif est de mettre en pratique les concepts d’architecture embarquée, de communication réseau, d’intégration d’API et de développement d’interfaces Web.
 
-Une interface Web permet de consulter les informations météorologiques sur le réseau local.
+## 2. Objectifs
 
-Ce projet constitue une mise en application concrète des concepts d’architecture embarquée, d’acquisition de données, de communication réseau et de développement d’interfaces logicielles.
+- Acquérir des données météorologiques à partir de capteurs physiques.
+- Centraliser les mesures et les données externes dans Home Assistant.
+- Exploiter l’API REST de Home Assistant pour accéder aux valeurs des capteurs.
+- Développer une interface Web dynamique pour visualiser les données.
+- Comparer les mesures locales aux informations météorologiques de Météo-France.
 
-## 2. Objectifs du projet
+## 3. Architecture globale
 
-L’objectif principal est de concevoir un système embarqué connecté capable de collecter, centraliser et visualiser des données météorologiques locales, tout en permettant leur comparaison avec des données météorologiques externes.
+Le système est organisé en trois couches fonctionnelles.
 
-Les objectifs spécifiques sont les suivants :
+| Couche | Composants | Fonction |
+|---|---|---|
+| Acquisition | Capteurs physiques et interfaces de communication | Mesure des paramètres environnementaux |
+| Traitement et centralisation | Raspberry Pi, Linux et Home Assistant | Intégration et centralisation des données |
+| Présentation | HTML, CSS et JavaScript | Affichage des données dans un navigateur |
 
-- Acquérir les données météorologiques à partir de capteurs physiques.
-- Transmettre les mesures issues des capteurs grâce à un ESP32.
-- Assurer la communication entre les équipements via Wi-Fi.
-- Centraliser les données sur une Raspberry Pi exécutant Home Assistant OS.
-- Récupérer les données météorologiques externes depuis l’API Météo-France.
-- Développer une interface Web pour visualiser les données.
-- Comparer les mesures locales aux données météorologiques externes.
-
-## 3. Matériel utilisé
-
-| Composant | Fonction |
-|---|---|
-| ESP32 | Acquisition des mesures et transmission des données |
-| Raspberry Pi | Hébergement de la plateforme de supervision |
-| Capteur de température | Mesure de la température ambiante |
-| Capteur d’humidité | Mesure de l’humidité de l’air |
-| Capteur de pression atmosphérique | Mesure de la pression atmosphérique |
-| Capteur de luminosité | Mesure de l’intensité lumineuse |
-| Capteur de vent | Acquisition des paramètres liés au vent |
-| Capteur de pluviométrie | Mesure des précipitations |
-
-## 4. Technologies utilisées
-
-| Technologie | Rôle |
-|---|---|
-| Linux / Home Assistant OS (HAOS) | Environnement d’exécution sur la Raspberry Pi |
-| Home Assistant | Centralisation et supervision des données |
-| HTML | Structure de l’interface Web |
-| CSS | Mise en forme de l’interface Web |
-| JavaScript | Gestion des interactions et de l’affichage, si utilisé |
-| Wi-Fi | Communication sans fil entre les équipements |
-| API REST | Échange de données entre les composants compatibles |
-| API Météo-France | Récupération des données météorologiques externes |
-| Paint | Conception de maquettes graphiques, si utilisé |
-
-## 5. Architecture du système
-
-L’architecture repose sur l’acquisition des mesures, leur transmission, leur centralisation et leur visualisation.
+### Schéma de fonctionnement
 
 ```text
-┌──────────────────────────────────┐
-│     CAPTEURS MÉTÉOROLOGIQUES     │
-│                                  │
-│ Température • Humidité           │
-│ Pression • Luminosité             │
-│ Vent • Pluviométrie               │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│              ESP32               │
-│ Acquisition des mesures          │
-│ Préparation des données          │
-└────────────────┬─────────────────┘
-                 │
-                 │ Wi-Fi
-                 │ API REST*
-                 ▼
-┌──────────────────────────────────┐
-│       Raspberry Pi — HAOS        │
-│                                  │
-│          Home Assistant          │◄──── API Météo-France
-│ Centralisation et supervision    │
-└────────────────┬─────────────────┘
-                 │
-                 ▼
-┌──────────────────────────────────┐
-│            INTERFACE WEB         │
-│                                  │
-│          HTML / CSS / JS         │
-│ Visualisation des données        │
-└──────────────────────────────────┘
+┌───────────────────────────────┐
+│       Capteurs physiques      │
+│ Température, humidité,        │
+│ pression, luminosité, vent,   │
+│ pluviométrie                  │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Raspberry Pi                  │
+│ Linux / Home Assistant OS     │
+│                               │
+│ Centralisation des données    │◄──── API Météo-France
+└───────────────┬───────────────┘
+                │
+                │ API REST / HTTP
+                ▼
+┌───────────────────────────────┐
+│ Interface Web                 │
+│ HTML / CSS / JavaScript       │
+│                               │
+│ Affichage et actualisation    │
+│ des données                   │
+└───────────────────────────────┘
 ```
 
-\* L’API REST est indiquée pour la liaison ESP32–Home Assistant si elle correspond bien au mécanisme utilisé dans votre réalisation.
+Le Wi-Fi assure la connectivité réseau. Les protocoles physiques utilisés pour les capteurs dépendent du matériel effectivement intégré.
 
-### Fonctionnement de l’architecture
+## 4. Matériel et technologies
 
-1. Les capteurs physiques mesurent les paramètres météorologiques locaux.
-2. L’ESP32 acquiert les mesures issues des capteurs.
-3. Les données sont transmises par Wi-Fi vers la plateforme centrale.
-4. Home Assistant centralise les données locales et les informations météorologiques externes intégrées.
-5. L’interface Web permet de consulter les mesures et de comparer les données disponibles.
+### Matériel
 
-## 6. Étapes de réalisation
+- **Raspberry Pi :** hébergement de la plateforme Home Assistant.
+- **Capteurs météorologiques :**
+  - Température ambiante (°C)
+  - Humidité relative (%)
+  - Pression atmosphérique
+  - Luminosité
+  - Vent
+  - Pluviométrie
 
-### Étape 1 — Analyse des besoins
+### Technologies logicielles
 
-Identification des paramètres météorologiques à mesurer et définition des fonctionnalités attendues : acquisition, communication, centralisation et visualisation.
+| Technologie | Utilisation |
+|---|---|
+| Linux / Home Assistant OS | Environnement de la plateforme domotique |
+| Home Assistant | Centralisation et supervision des données |
+| HTML / CSS | Structure et mise en forme de l’interface |
+| JavaScript | Requêtes HTTP et actualisation dynamique des données |
+| API REST / HTTP | Accès aux états des entités Home Assistant |
+| API Météo-France | Intégration des données météorologiques externes |
+| Wi-Fi | Connectivité réseau |
 
-### Étape 2 — Acquisition des données
+## 5. Choix techniques
 
-Intégration des capteurs physiques et utilisation de l’ESP32 pour recueillir les mesures de température, d’humidité, de pression, de luminosité, de vent et de pluviométrie.
+Plusieurs combinaisons de technologies ont été étudiées au début du projet.
 
-### Étape 3 — Installation de la plateforme embarquée
-
-Installation de Home Assistant OS sur la Raspberry Pi et configuration de l’environnement de supervision.
-
-### Étape 4 — Mise en place de la communication
-
-Utilisation du réseau Wi-Fi et du mécanisme d’échange configuré pour transmettre les données de l’ESP32 vers la plateforme centrale.
-
-### Étape 5 — Intégration des données externes
-
-Récupération des données météorologiques provenant de l’API Météo-France afin de disposer d’informations de référence pour la comparaison avec les mesures locales.
-
-### Étape 6 — Conception de l’interface Web
-
-Conception de la présentation graphique et mise en place de l’interface de visualisation associée à Home Assistant.
-
-Les technologies HTML et CSS permettent respectivement de structurer et de mettre en forme l’interface Web.
-
-### Étape 7 — Tests et vérification
-
-Vérification de l’acquisition des mesures, de la transmission des données, de leur affichage et de la cohérence des informations disponibles.
-
-## 7. Interface Web et visualisation
-
-L’interface Web permet de consulter les informations météorologiques collectées par la station et celles provenant de Météo-France.
-
-Elle vise à faciliter :
-
-- La lecture des mesures issues des différents capteurs.
-- La consultation des données centralisées dans Home Assistant.
-- La comparaison des mesures locales avec les informations externes.
-- L’accès aux informations depuis un navigateur connecté au réseau local.
-
-La présentation graphique vise à rendre les informations accessibles et faciles à interpréter.
-
-## 8. Communication et échanges de données
-
-La communication du système repose sur le réseau Wi-Fi et des mécanismes d’échange adaptés à l’architecture mise en place.
-
-- **ESP32 :** acquisition des données des capteurs.
-- **Wi-Fi :** connectivité sans fil.
-- **API REST :** échange de données entre les composants compatibles.
-- **Home Assistant :** centralisation et supervision sur la Raspberry Pi.
-- **API Météo-France :** fourniture des données météorologiques externes.
-- **Interface Web :** affichage des informations météorologiques.
-
-## 9. Comparaison des solutions techniques
-
-Plusieurs approches peuvent être envisagées pour développer un système embarqué connecté.
-
-| Environnement | Technologies | Communication | Complexité estimée | Interface Web |
+| Système | Interface / technologie | Communication | Complexité estimée | Choix |
 |---|---|---|---|---|
-| Linux / HAOS | HTML, CSS, JavaScript | Wi-Fi / REST | Modérée | Oui |
-| Linux | Qt / C++ | Bluetooth | Élevée | Non, par défaut |
-| Linux | PHP | Zigbee / Z-Wave | Modérée | Possible |
-| Linux | Python (script) | I²C / SPI / UART | Faible à modérée | Non, pour un script seul |
+| Linux / Home Assistant | HTML, CSS, JavaScript | Wi-Fi / REST | Modérée | Retenu |
+| Linux | Qt / C++ | Bluetooth | Élevée | Non retenu |
+| Linux | PHP | Zigbee / Z-Wave | Modérée | Non retenu |
+| Linux | Python (script) | I²C / SPI / UART | Faible | Partiel / non retenu comme solution principale |
 
-La solution retenue repose sur Home Assistant OS, une Raspberry Pi et un ESP32. Elle permet de réunir l’acquisition des mesures, la communication réseau et la supervision dans une architecture commune.
+La solution Home Assistant associée à une interface Web a été retenue pour sa flexibilité, sa cohérence et sa facilité d'intégration dans le temps imparti. JavaScript côté client permet d'interroger directement l'API REST, sans ajouter de serveur intermédiaire dédié.
 
-Ce tableau présente des approches techniques générales. Les protocoles et technologies des solutions alternatives ne sont pas nécessairement utilisés dans ce projet.
+## 6. Fonctionnement de la partie logicielle
 
-## 10. Compétences mobilisées
+### 6.1. Rôle de Home Assistant
+
+Home Assistant constitue le point central de l’architecture. Il permet :
+
+- D’intégrer les données des capteurs physiques.
+- De récupérer les informations météorologiques via l’intégration Météo-France configurée.
+- D’exposer les états des capteurs sous forme d’entités.
+- De rendre ces états accessibles à travers son API REST.
+
+Chaque capteur est représenté par une entité identifiée par un `entity_id`. Son état courant (`state`) et ses attributs (`attributes`) peuvent être récupérés au format JSON.
+
+### 6.2. Récupération des données via l’API REST
+
+L’interface Web interroge l’API de Home Assistant au moyen de requêtes HTTP asynchrones utilisant la fonction `fetch()` de JavaScript.
+
+Exemple de point d’accès :
+
+```http
+GET http://<IP_RASPBERRY>:8123/api/states/<entity_id>
+Authorization: Bearer <TOKEN>
+```
+
+Le jeton d’accès permet d’authentifier les requêtes auprès de Home Assistant.
+
+Le fonctionnement est le suivant :
+
+1. Le navigateur charge la page Web.
+2. JavaScript envoie une requête HTTP GET pour chaque entité à afficher.
+3. Home Assistant renvoie les données au format JSON.
+4. JavaScript extrait les valeurs utiles et actualise les éléments HTML.
+5. Les requêtes sont répétées à intervalles réguliers, par exemple toutes les 30 secondes, sans recharger la page.
+
+### 6.3. Affichage et traitement des données
+
+Le traitement côté JavaScript reste volontairement simple :
+
+- Extraction des valeurs depuis les réponses JSON.
+- Formatage des valeurs numériques et ajout des unités.
+- Affichage de la date et de l’heure.
+- Mise à jour dynamique des éléments de la page.
+
+Cette approche limite la complexité du code et facilite la maintenance de l’interface.
+
+### 6.4. Gestion de la sécurité et de la communication
+
+L’accès à l’API REST nécessite un jeton d’authentification Home Assistant. Celui-ci doit être conservé de manière sécurisée et ne pas être publié dans le dépôt GitHub.
+
+Lorsque la page Web et Home Assistant sont hébergés sur des origines différentes, la politique CORS du navigateur peut bloquer les requêtes. La configuration réseau et les autorisations d’origine doivent alors être adaptées à l’architecture retenue.
+
+
+## 8. Compétences mobilisées
 
 - Architecture des systèmes embarqués.
-- Acquisition de données par capteurs.
-- Utilisation d’un microcontrôleur ESP32.
-- Intégration d’une Raspberry Pi sous Linux.
-- Configuration et exploitation de Home Assistant OS.
-- Communication sans fil Wi-Fi.
-- Échanges de données via API REST.
-- Intégration de données météorologiques externes.
-- Conception et développement d’interfaces Web.
-- Visualisation et comparaison de données.
-- Intégration et validation d’un système matériel et logiciel.
+- Acquisition de données environnementales.
+- Intégration et supervision avec Home Assistant.
+- Communication réseau Wi-Fi.
+- Utilisation d’API REST et de requêtes HTTP.
+- Développement Web avec HTML, CSS et JavaScript.
+- Manipulation de données JSON.
+- Tests et validation d’une architecture matérielle et logicielle.
+- Travail collaboratif et intégration de composants.
 
-## 11. Conclusion
+## 9. Conclusion
 
-Ce projet illustre la conception d’une station météo connectée associant acquisition physique, communication réseau, supervision et visualisation de données.
+Ce projet met en œuvre une architecture embarquée connectée associant capteurs, Raspberry Pi, Home Assistant et interface Web. L’utilisation de l’API REST permet de rendre les données accessibles à l’interface et de les afficher dynamiquement dans un navigateur.
 
-L’association de l’ESP32, de la Raspberry Pi et de Home Assistant permet de centraliser les mesures environnementales et les informations météorologiques externes dans un même système. Cette réalisation constitue une mise en pratique des principes d’architecture embarquée et d’intégration entre matériel et logiciel.
-
-## 12. Contexte académique
-
-- **Formation :** Master — Conception des Systèmes Électroniques et Communicants
-- **Établissement :** Université de Lorraine
-- **Unité d’enseignement :** UE 852.2 — Architectures Embarquées
-- **Encadrement :** Professeur Camille Diou
-- **Type de projet :** Projet académique réalisé en groupe
+Cette réalisation constitue une application pratique des principes d’acquisition de données, de communication réseau, de supervision et de développement logiciel dans le domaine des systèmes embarqués.
 
 ---
 
-**Domaines :** Systèmes embarqués · IoT · Acquisition de données · Communication Wi-Fi · Home Assistant · API REST · Développement Web
+**Contexte académique :** UE 852.2 — Architectures Embarquées, Université de Lorraine.
+
+**Encadrement :** Professeur Camille Diou.
+
+**Domaines :** Systèmes embarqués · IoT · Home Assistant · API REST · HTML/CSS/JavaScript · Acquisition de données
