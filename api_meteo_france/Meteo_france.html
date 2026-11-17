@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Météo d'un CSEC</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-image: url("12.png");
+  background-size: cover;        /* l'image couvre tout l'écran */
+  background-position: center;   /* centrée */
+  background-repeat: no-repeat;  /* pas de répétition */
+  height: 100vh;
+  padding: 30px;
+}
+
+    input {
+      padding: 10px;
+      width: 200px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #weather {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      display: inline-block;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    img {
+      width: 80px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Météo d'un CSEC</h1>
+
+  <input type="text" id="city" placeholder="Entrez la ville" />
+  <button onclick="getWeather()">Afficher</button>
+
+  <div id="weather"></div>
+
+  <script>
+    async function getWeather() {
+      const city = document.getElementById("city").value;
+      const weatherDiv = document.getElementById("weather");
+
+      if (!city) {
+        weatherDiv.innerHTML = "<p>Veuillez entrer une ville.</p>";
+        return;
+      }
+
+      const apiKey = "44acebd160a3936df82572b404b3cb7b";
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=fr`;
+
+      try {
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          throw new Error("Ville non trouvée");
+        }
+
+        const data = await res.json();
+
+        const icon = data.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+
+        const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString();
+        const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString();
+
+        weatherDiv.innerHTML = `
+          <h2>${data.name}, ${data.sys.country}</h2>
+          <img src="${iconUrl}" alt="icone météo">
+          <p><strong>${data.weather[0].description}</strong></p>
+
+          <p>🌡 Température : ${data.main.temp}°C</p>
+          <p>🤒 Ressentie : ${data.main.feels_like}°C</p>
+          <p>📉 Min : ${data.main.temp_min}°C | 📈 Max : ${data.main.temp_max}°C</p>
+
+          <p>💧 Humidité : ${data.main.humidity}%</p>
+          <p>🔵 Pression : ${data.main.pressure} hPa</p>
+
+          <p>🌬 Vent : ${data.wind.speed} m/s</p>
+          <p>🧭 Direction : ${data.wind.deg}°</p>
+
+          <p>☁ Nuages : ${data.clouds.all}%</p>
+          <p>👁 Visibilité : ${data.visibility / 1000} km</p>
+
+          <p>🌅 Lever du soleil : ${sunrise}</p>
+          <p>🌇 Coucher du soleil : ${sunset}</p>
+        `;
+      } catch (error) {
+        weatherDiv.innerHTML = "<p>Erreur : impossible de récupérer la météo.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
